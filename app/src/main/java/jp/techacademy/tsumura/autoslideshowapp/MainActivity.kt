@@ -56,30 +56,30 @@ class MainActivity : AppCompatActivity(){
         )
 
         if (cursor!!.moveToFirst()) {
-                // indexからIDを取得し、そのIDから画像のURIを取得する
-                val fieldIndex = cursor.getColumnIndex(MediaStore.Images.Media._ID)
-                val id = cursor.getLong(fieldIndex)
-                val imageUri = ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id)
-
+            // indexからIDを取得し、そのIDから画像のURIを取得する
+            val fieldIndex = cursor.getColumnIndex(MediaStore.Images.Media._ID)
+            val id = cursor.getLong(fieldIndex)
+            val imageUri = ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id)
                 imageView.setImageURI(imageUri)
 
+
+            val position=cursor.getPosition()
             next_button.setOnClickListener {
                 if (cursor.moveToNext()) {
-                    imageView.setImageURI(imageUri)
-                } else if (cursor.moveToFirst()) {
-                    imageView.setImageURI(imageUri)
+                    Log.d("kotlin",position.toString())
+                } else if (cursor.moveToFirst()){
+                    Log.d("kotlin",position.toString())
                 }
             }
             back_button.setOnClickListener{
-                if (cursor.moveToPrevious()) {
-                    imageView.setImageURI(imageUri)
+                if (cursor.moveToPrevious()){
+                    Log.d("kotlin",position.toString())
                 } else if (cursor.moveToLast()) {
-                    imageView.setImageURI(imageUri)
+                    Log.d("kotlin",position.toString())
                 }
             }
 
         }
 
-        cursor.close()
     }
 }
