@@ -9,10 +9,16 @@ import android.util.Log
 import android.provider.MediaStore
 import android.content.ContentUris
 import android.icu.lang.UCharacter.GraphemeClusterBreak.V
+import android.os.Handler
 import kotlinx.android.synthetic.main.activity_main.*
+import java.util.*
 
 class MainActivity : AppCompatActivity(){
     private val PERMISSIONS_REQUEST_CODE = 100
+
+    private var mTimer: Timer?=null
+
+    private var mHandler = Handler()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -60,26 +66,81 @@ class MainActivity : AppCompatActivity(){
             val fieldIndex = cursor.getColumnIndex(MediaStore.Images.Media._ID)
             val id = cursor.getLong(fieldIndex)
             val imageUri = ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id)
-                imageView.setImageURI(imageUri)
 
+            imageView.setImageURI(imageUri)
+        }
 
-            val position=cursor.getPosition()
-            next_button.setOnClickListener {
+        play_button.setOnClickListener {
+            if (mTimer == null) {
+                play_button.text="停止"
+                next_button.text=""
+                back_button.text=""
+
+                // タイマーの作成
+                mTimer = Timer()
+
+                // タイマーの始動
+                mTimer!!.schedule(object : TimerTask() {
+                    override fun run() {
+                        mHandler.post {
+                            if(cursor.moveToNext()){
+                                val fieldIndex6 = cursor.getColumnIndex(MediaStore.Images.Media._ID)
+                                val id6 = cursor.getLong(fieldIndex6)
+                                val imageUri6 = ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id6)
+
+                                imageView.setImageURI(imageUri6)
+                            }else if(cursor.moveToFirst()){
+                                val fieldIndex7 = cursor.getColumnIndex(MediaStore.Images.Media._ID)
+                                val id7 = cursor.getLong(fieldIndex7)
+                                val imageUri7 = ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id7)
+
+                                imageView.setImageURI(imageUri7)
+                            }
+                        }
+                    }
+                }, 2000, 2000) // 最初に始動させるまで 100ミリ秒、ループの間隔を 100ミリ秒 に設定
+
+            }else if(mTimer!=null){
+                play_button.text="再生"
+                next_button.text="次へ"
+                back_button.text="戻る"
+                mTimer!!.cancel()
+                mTimer=null
+            }
+
+        }
+        next_button.setOnClickListener {
+            if(mTimer==null){
                 if (cursor.moveToNext()) {
-                    Log.d("kotlin",position.toString())
-                } else if (cursor.moveToFirst()){
-                    Log.d("kotlin",position.toString())
+                    val fieldIndex2 = cursor.getColumnIndex(MediaStore.Images.Media._ID)
+                    val id2 = cursor.getLong(fieldIndex2)
+                    val imageUri2 = ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id2)
+                    imageView.setImageURI(imageUri2)
+
+                }else if (cursor.moveToFirst()) {
+                    val fieldIndex3 = cursor.getColumnIndex(MediaStore.Images.Media._ID)
+                    val id3 = cursor.getLong(fieldIndex3)
+                    val imageUri3 = ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id3)
+                    imageView.setImageURI(imageUri3)
                 }
             }
-            back_button.setOnClickListener{
+        }
+
+        back_button.setOnClickListener{
+            if (mTimer==null){
                 if (cursor.moveToPrevious()){
-                    Log.d("kotlin",position.toString())
+                    val fieldIndex4 = cursor.getColumnIndex(MediaStore.Images.Media._ID)
+                    val id4 = cursor.getLong(fieldIndex4)
+                    val imageUri4 = ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id4)
+                    imageView.setImageURI(imageUri4)
                 } else if (cursor.moveToLast()) {
-                    Log.d("kotlin",position.toString())
+                    val fieldIndex5 = cursor.getColumnIndex(MediaStore.Images.Media._ID)
+                    val id5 = cursor.getLong(fieldIndex5)
+                    val imageUri5 = ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id5)
+                    imageView.setImageURI(imageUri5)
                 }
             }
 
         }
-
     }
 }
